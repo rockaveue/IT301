@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Лаборатори-4</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+<h4>Лаборатори-4</h4>
+<div class="form-group form-group-last">
+  <div class="alert alert-secondary" role="alert">
+    <div class="alert-icon"><i class="flaticon-warning kt-font-brand"></i></div>
+    <div class="alert-text">
+      Зорилго: Аjax ашиглах
+    </div>
+  </div>
+</div>
+<form>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Нэр:</label>
+      <input type="text" name="name" class="form-control">
+    </div>
+    <div class="col-sm-6">
+      <label>Цахим шуудан:</label>
+      <input type="text" name="email" class="form-control">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Нууц үг:</label>
+      <input type="password" name="pass" class="form-control">
+    </div>
+    <div class="col-sm-6">
+      <label>Нууц үг давтах:</label>
+      <input type="password" name="repass" class="form-control">
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-sm-6">
+      <input type="button" onclick="insert()" value="Хадгалах" class="btn  btn-prmary">
+      <span id="divResult"></span>
+    </div>
+  </div>
+</form>
+</div>
+<script>
+function insert()
+{
+  var name = document.getElementsByName('name')[0].value;
+  var pass = document.getElementsByName('pass')[0].value;
+  var email = document.getElementsByName('email')[0].value;
+
+  var ajax = new XMLHttpRequest();
+  ajax.onreadystatechange = function(){
+    if(ajax.readyState == 4 && ajax.status == 200)
+    {
+      document.getElementById("divResult").innerHTML = ajax.responseText;
+    }
+  }
+  ajax.open("GET", "insert.php?name=" + name + "&email=" + email + "&pass=" + pass, false);
+  ajax.send();
+  console.log('test');
+
+}
+</script>
+</body>
+</html>

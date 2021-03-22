@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Лаборатори-4</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-2">
+    <h4>Лаборатори-4</h4>
+    <div class="form-group form-group-last">
+        <div class="alert alert-secondary" role="alert">
+            <div class="alert-icon"><i class="flaticon-warning kt-font-brand"></i></div>
+            <div class="alert-text">
+            Зорилго: Аjax ашиглах
+            </div>
+        </div>
+    </div>
+    <form>
+    <div class="row">
+        <div class="col-sm-1">
+        <input type="radio" name="turul" id="ner" checked>
+        </div>
+        <div class="col-sm-1" style="padding-left: 0px;">
+            Нэрээр
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-1">
+            <input type="radio" name="turul" id="tsahim" >
+        </div>
+        <div class="col-sm-3" style="padding-left: 0px;">
+            Цахим хаягаар
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-sm-6">
+            <!-- оролт ирэх бүрт search() функцийг дуудах text input -->
+        <input id = 'text' type="text" name="text" autocomplete="off" class="form-control" oninput="search('')">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <!-- Үр дүнг харуулах хэсэг -->
+            <span id="divResult"></span>
+        </div>
+    </div>
+    </form>
+</div>
+<script>
+// search функц
+// @hariu - хэрэв edit эсвэл delete үйлдэл хийсэн бол алийг нь хийсэн бэ гэх мэдээллийг хүргэх утга
+function search(hariu)
+{
+    // Тухайн оролтын утгыг авав
+    var text = document.getElementsByName('text')[0].value;
+    // Хэрэв оролтын утга хоосон бол хайхгүй
+    if(text != ''){
+        // шинэ хүсэлтийн утга
+        var ajax = new XMLHttpRequest();
+        ajax.onreadystatechange = function(){
+            if(ajax.readyState == 4 && ajax.status == 200)
+            {
+                // Ирсэн text төрлийн утгыг JSON төрөл рүү хувиргалт хийн хадгалав
+                var myobj = JSON.parse(ajax.responseText);
+                // col утгад ирсэн JSON утгуудын түлхүүр болох хүснэгтийн баганын нэрсийг хадгалав
+                var col = [];
+                for (var i = 0; i < myobj.length; i++) {
+                    for (var key in myobj[i]) {
+                        if (col.indexOf(key) === -1) {
+                            col.push(key);
+                        }
+                    }
+                }
+                // Table болох хүснэгтийн таг үүсгэж table класстай болгов
+                var table = document.createElement("table");
+                table.classList.add("table");
+
+                var tr = table.insertRow(-1); // Мөр нэмэх үйлдэл
+                // толгойн утгууд
+                var headerName = ["#", "Нэр", "И-мэйл", "Нууц үг", "Удирдах"];
+                 // толгойн утгуудыг хүснэгтэнд хүснэгтийн толгой хэлбэрээр тус тус оруулав
+                for (var i = 0; i < headerName.length; i++) {
+                    var th = document.createElement("th"); // table head таг үүсгэх
+                    th.innerHTML = headerName[i]; //  тухайн таг-нд толгойн утгыг хийв
+                    tr.appendChild(th); // үүсгэсэн table head-ийг хамгийн эхний мөр лүү хийв
+                    th.scope = 'row'; // scope аттрибутад row гэсэн утга оноов
+                }
+                // Ирсэн бичлэгийн тоогоор ажиллах давталт
+                for (var i = 0; i < myobj.length; i++) {
+
+                    tr = table.insertRow(-1); // шинэ мөр нэмэв
+                    // col.length-1 гэж хамгийн сүүлийн багана болох lastaccess-аас бусад багануудаар гүйлгэх давталт
+                    for (var j = 0; j < col.length - 1; j++) {
+                        // шинэ багана нэмэв
+                        var tabCell = tr.insertCell(-1); 
+                        // тухайн баганад ирсэн JSON хэлбэртэй утгаас тухайн мөрийн баганад харгалзуулан утга олгов
+                        tabCell.innerHTML = myobj[i][col[j]]; 
+                    }
+                    // засах устгах үйлдэл оруулах дахин нэг багана нэмж байна
+                    var tabCell = tr.insertCell(-1); 
+                    // бичлэг бүрийн employeeid-г myobjid утгад хадгалав
+                    myobjid = myobj[i][col[0]];
+                    // засах устгах оруулах а тагууд 
+                    // энэ давталтын дараа засах, устгах тагуудад onclick event тус бүрт нь өгнө
+                    // тухайн бичлэгийн id-г title аттрибутад хадгалав
+                    tabCell.innerHTML = "<a class='zasah' class='mr-2' href='javascript:;' title = '"+ myobjid +"'>Засах</a>, <a class='zasah ustgah' class='mr-2' href='javascript:;' title = '"+ myobjid +"'>Устгах</a>";
+                }
+
+                // Хүснэгтээ гаргаж авах утгаа олгож байна
+                var divContainer = document.getElementById("divResult");
+                // тухайн утгад байсан хуучин утгуудыг хоослов
+                divContainer.innerHTML = "";
+                // Шинэ хүснэгтээ залгаж нэмэв.
+                divContainer.appendChild(table);
+                // document.getElementById("divResult").innerHTML = JSON.stringify(myobj);
+                // edit, delete үйлдэл хийсэн бол шинэ text үүсгэж хариуг нь залгав
+                var hariu2 = document.createTextNode(hariu);
+                divContainer.appendChild(hariu2);
+
+                // zasah гэсэн класстай бүх а тагуудыг matches утгад авав
+                matches = document.querySelectorAll("a.zasah");
+                // matches-д орсон элемент бүрээр орох давталт
+                matches.forEach(element => {
+                    // элемент бүрт onclick аттрибут хийж өгөв
+                    element.addEventListener('click', function(){
+                        // засах үйлдэл хийхэд ашиглах нэрийг text-д хадгалав
+                        text = document.getElementById('text').value;
+                        // ямар бичлэгийг засах вэ гэдгийг title аттрибутад олгосон id-гаар мэдэж авна
+                        myobjid = this.getAttribute('title');
+                        // хэрэв тухайн элемент-д ustgah гэдэг класс байвал устгах хэлбэрээр change функцийг дуудна.
+                        if(element.classList.contains('ustgah')){
+                            change(2, myobjid, text);
+                        } else{
+                            change(1, myobjid, text); // байхгүй бол засах хэлбэрээр дуудна
+                        }
+                        
+                    });
+                });
+            }
+        }
+        // Хэрэв нэрээр хайх сонголт идэвхжсэн бол оролтын утгыг нэр хэлбэрээр явуулна
+        if(document.getElementById("ner").checked == true){
+            ajax.open("GET", "B180910062.php?name=" + text, true);
+        } else {
+            // Харин и-мэйлээр хайх сонголт идэвхжсэн бол оролтын утгыг имэйл хэлбэрээр явуулна
+            ajax.open("GET", "B180910062.php?email=" + text, true);
+        }
+        // явуулж буй үйлдэл
+        ajax.send();
+        // console.log('test');
+    }
+}
+// засах, устгах үйлдлүүдийг AJAX хэлбэрээр хүсэлт илгээж хийх функц
+// @type - 1 бол засах, 2 бол устгах
+// @myobjid - засах эсвэл устгах бичлэгийн id
+// @text - хэрэв засах бол засах нэр нь
+function change(type, myobjid, text){
+    // Тухайн оролтын утгыг авав
+    var text = document.getElementsByName('text')[0].value;
+    // Хэрэв оролтын утга хоосон бол хайхгүй
+    if(text != ''){
+        // шинэ хүсэлтийн утга
+        var ajax2 = new XMLHttpRequest();
+        ajax2.onreadystatechange = function(){
+            if(ajax2.readyState == 4 && ajax2.status == 200)
+            {
+                // Ямар нэгэн үйлдэл хийгээд хариу ирвэл хүснэгтийн доор хариуг үзүүлнэ
+                search(ajax2.responseText);
+            }
+        }
+        if(document.getElementById("ner").checked == true){
+            editType = 1;
+        } else {
+            editType = 2;
+        }
+        // засах хэлбэрээр дуудсан бол явуулах хүсэлт
+        if(type == 1){
+            ajax2.open("GET", "B180910062.php?crud=edit&edittype="+editType+"&id="+ myobjid +"&newname="+ text, true);
+        } else {
+            // устгах хэлбэрээр дуудсан бол явуулах хүсэлт
+            ajax2.open("GET", "B180910062.php?crud=delete&id="+ myobjid, true);
+        }
+        // явуулж буй үйлдэл
+        ajax2.send();
+    }
+}
+</script>
+</body>
+</html>
